@@ -97,8 +97,16 @@ func readRegisterData(ade ade9000.ADE9000Interface) {
 	ade.ReadActivePowerRegs(&activePower)
 	print("AVRMS: ")
 	fmt.Printf("%X\n", voltageRms.VoltageRMSReg_A)
+	print("BVRMS: ")
+	fmt.Printf("%X\n", voltageRms.VoltageRMSReg_B)
+	print("CVRMS: ")
+	fmt.Printf("%X\n", voltageRms.VoltageRMSReg_C)
 	print("AWATT: ")
 	fmt.Printf("%X\n", activePower.ActivePowerReg_A)
+	print("BWATT: ")
+	fmt.Printf("%X\n", activePower.ActivePowerReg_B)
+	print("CWATT: ")
+	fmt.Printf("%X\n", activePower.ActivePowerReg_C)
 }
 
 func readResampledData(ade ade9000.ADE9000Interface) {
@@ -128,7 +136,7 @@ func readResampledData(ade ade9000.ADE9000Interface) {
 func loop(ade ade9000.ADE9000Interface) {
 	for {
 		readRegisterData(ade)
-		readResampledData(ade)
-		time.Sleep(10000 * time.Millisecond)
+		// readResampledData(ade)
+		time.Sleep(1000 * time.Millisecond)
 	}
 }
