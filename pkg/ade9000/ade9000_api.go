@@ -148,7 +148,7 @@ func (ade *ADE9000Api) SPI_Read_32bit(address uint16) (uint32, error) {
 	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
 		return 0, err
 	}
-	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address)}, read); err != nil {
+	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address), 0x00, 0x00}, read); err != nil {
 		return 0, err
 	}
 	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
