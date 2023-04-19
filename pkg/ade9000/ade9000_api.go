@@ -11,16 +11,6 @@ import (
 	"periph.io/x/conn/v3/spi/spireg"
 )
 
-/*
-// PA8 -> CS
-// PA7 -> PM_1
-// PA9 -> ADE9000_RESET_PIN
-// PA10 -> IRQ0
-// PA20 -> IRQ1
-// PC4 -> CF4/DREADY/EVENT
-// PC7 -> CF3/ZX
-*/
-
 type ADE9000Api struct {
 	chipSelect_Pin gpio.PinIO
 	spiConn        spi.Conn
