@@ -71,7 +71,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%v\n", read)
+	fmt.Printf("%X\n", read)
 
 	loop(ade)
 }
@@ -90,15 +90,15 @@ func readRegisterData(ade ade9000.ADE9000Interface) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%v\n", airms)
+	fmt.Printf("%X\n", airms)
 	voltageRms := ade9000.VoltageRMSRegs{}
 	activePower := ade9000.ActivePowerRegs{}
 	ade.ReadVoltageRMSRegs(&voltageRms)
 	ade.ReadActivePowerRegs(&activePower)
 	print("AVRMS: ")
-	fmt.Printf("%v\n", voltageRms.VoltageRMSReg_A)
+	fmt.Printf("%X\n", voltageRms.VoltageRMSReg_A)
 	print("AWATT: ")
-	fmt.Printf("%v\n", activePower.ActivePowerReg_A)
+	fmt.Printf("%X\n", activePower.ActivePowerReg_A)
 }
 
 func readResampledData(ade ade9000.ADE9000Interface) {
@@ -111,17 +111,17 @@ func readResampledData(ade ade9000.ADE9000Interface) {
 	}
 	for i := 0; i < ade9000.WFB_ELEMENT_ARRAY_SIZE; i++ {
 		print("VA: ")
-		fmt.Printf("%v\n", resampledData.VA_Resampled[i])
+		fmt.Printf("%X\n", resampledData.VA_Resampled[i])
 		print("VB: ")
-		fmt.Printf("%v\n", resampledData.VB_Resampled[i])
+		fmt.Printf("%X\n", resampledData.VB_Resampled[i])
 		print("VC: ")
-		fmt.Printf("%v\n", resampledData.VC_Resampled[i])
+		fmt.Printf("%X\n", resampledData.VC_Resampled[i])
 		print("IA: ")
-		fmt.Printf("%v\n", resampledData.IA_Resampled[i])
+		fmt.Printf("%X\n", resampledData.IA_Resampled[i])
 		print("IB: ")
-		fmt.Printf("%v\n", resampledData.IB_Resampled[i])
+		fmt.Printf("%X\n", resampledData.IB_Resampled[i])
 		print("IC: ")
-		fmt.Printf("%v\n", resampledData.IC_Resampled[i])
+		fmt.Printf("%X\n", resampledData.IC_Resampled[i])
 	}
 }
 
