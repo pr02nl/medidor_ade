@@ -167,7 +167,7 @@ func (ade *ADE9000Api) SPI_Read_32bit(address uint16) (uint32, error) {
 	return uint32(read[0])<<24 + uint32(read[1])<<16 + uint32(read[2])<<8 + uint32(read[3]), nil
 }
 
-func (ade *ADE9000Api) SPI_Init(SPI_speed uint32, chipSelect_Pin string) (*spi.PortCloser, error) {
+func (ade *ADE9000Api) SPI_Init(SPI_speed uint32, chipSelect_Pin string) (spi.PortCloser, error) {
 	spinSelect := gpioreg.ByName(chipSelect_Pin)
 	if spinSelect == nil {
 		return nil, errors.New("failed to find chip select pin" + chipSelect_Pin)
@@ -188,7 +188,7 @@ func (ade *ADE9000Api) SPI_Init(SPI_speed uint32, chipSelect_Pin string) (*spi.P
 	if err != nil {
 		return nil, err
 	}
-	return &p, nil
+	return p, nil
 }
 
 func (ade *ADE9000Api) SPI_Burst_Read_Resampled_Wfb(address uint16, read_Element_Length uint16) (*ResampledWfbData, error) {
