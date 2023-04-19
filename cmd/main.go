@@ -66,12 +66,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	print("Reading ADE9000 registers\n")
+	print("RUN Register: ")
 	read, err := ade.SPI_Read_16bit(ade9000.ADDR_RUN)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%v\n", read)
+
+	loop(ade)
 }
 
 func resetADE9000(reset_pin gpio.PinIO) {
@@ -80,4 +82,53 @@ func resetADE9000(reset_pin gpio.PinIO) {
 	reset_pin.Out(gpio.High)
 	time.Sleep(100 * time.Millisecond)
 	println("Reset done")
+}
+
+func readRegisterData(ade *ade9000.ADE9000Api) {
+	print("AIRMS: ")
+	airms, err := ade.SPI_Read_32bit(ade9000.ADDR_AIRMS)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%v\n", airms)
+	voltageRms := ade9000.VoltageRMSRegs{}
+	activePower := ade9000.ActivePowerRegs{}
+	ade.ReadVoltageRMSRegs(&voltageRms)
+	ade.ReadActivePowerRegs(&activePower)
+	print("AVRMS: ")
+	fmt.Printf("%v\n", voltageRms.VoltageRMSReg_A)
+	print("AWATT: ")
+	fmt.Printf("%v\n", activePower.ActivePowerReg_A)
+}
+
+func readResampledData(ade *ade9000.ADE9000Api) {
+	ade.SPI_Write_16bit(ade9000.ADDR_WFB_CFG, 0x1000)
+	ade.SPI_Write_16bit(ade9000.ADDR_WFB_CFG, 0x1010)
+	time.Sleep(100 * time.Millisecond)
+	resampledData, err := ade.SPI_Burst_Read_Resampled_Wfb(0x800, ade9000.WFB_ELEMENT_ARRAY_SIZE)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for i := 0; i < ade9000.WFB_ELEMENT_ARRAY_SIZE; i++ {
+		print("VA: ")
+		fmt.Printf("%v\n", resampledData.VA_Resampled[i])
+		print("VB: ")
+		fmt.Printf("%v\n", resampledData.VB_Resampled[i])
+		print("VC: ")
+		fmt.Printf("%v\n", resampledData.VC_Resampled[i])
+		print("IA: ")
+		fmt.Printf("%v\n", resampledData.IA_Resampled[i])
+		print("IB: ")
+		fmt.Printf("%v\n", resampledData.IB_Resampled[i])
+		print("IC: ")
+		fmt.Printf("%v\n", resampledData.IC_Resampled[i])
+	}
+}
+
+func loop(ade *ade9000.ADE9000Api) {
+	for {
+		readRegisterData(ade)
+		readResampledData(ade)
+		time.Sleep(10000 * time.Millisecond)
+	}
 }
