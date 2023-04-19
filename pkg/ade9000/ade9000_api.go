@@ -20,10 +20,6 @@ func NewADE9000Api() *ADE9000Api {
 	return &ADE9000Api{}
 }
 
-func (ade *ADE9000Api) ChipSelect_Pin() gpio.PinIO {
-	return ade.chipSelect_Pin
-}
-
 func (ade *ADE9000Api) SetupADE9000() error {
 	if err := ade.SPI_Write_16bit(ADDR_PGA_GAIN, ADE9000_PGA_GAIN); err != nil {
 		return err

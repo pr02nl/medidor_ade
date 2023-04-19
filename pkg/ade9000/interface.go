@@ -1,5 +1,7 @@
 package ade9000
 
+import "periph.io/x/conn/v3/spi"
+
 const (
 	WFB_ELEMENT_ARRAY_SIZE = 512
 )
@@ -163,15 +165,14 @@ type TemperatureRegnValue struct {
 }
 
 type ADE9000Interface interface {
-	chipSelect_Pin() byte
 	SetupADE9000() error
 	/*SPI Functions*/
-	SPI_Init(SPI_speed uint32, chipSelect_Pin byte) error
+	SPI_Init(SPI_speed uint32, chipSelect_Pin string) (spi.PortCloser, error)
 	SPI_Write_16bit(address uint16, data uint16) error
 	SPI_Write_32bit(address uint16, data uint32) error
 	SPI_Read_16bit(address uint16) (uint16, error)
 	SPI_Read_32bit(address uint16) (uint32, error)
-	SPI_Burst_Read_Resampled_Wfb(address uint16, read_Element_Length uint16) (ResampledWfbData, error)
+	SPI_Burst_Read_Resampled_Wfb(address uint16, read_Element_Length uint16) (*ResampledWfbData, error)
 	/*ADE9000 Calculated Parameter Read Functions*/
 	ReadActivePowerRegs(data *ActivePowerRegs) error
 	ReadReactivePowerRegs(data *ReactivePowerRegs) error
@@ -197,5 +198,5 @@ type ADE9000Interface interface {
 	WriteByteToEeprom(dataAddress uint16, data uint8) error
 	ReadByteFromEeprom(dataAddress uint16) (uint8, error)
 	WriteWordToEeprom(address uint16, data uint32) error
-	readWordFromEeprom(address uint16) (uint32, error)
+	ReadWordFromEeprom(address uint16) (uint32, error)
 }

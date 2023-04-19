@@ -84,7 +84,7 @@ func resetADE9000(reset_pin gpio.PinIO) {
 	println("Reset done")
 }
 
-func readRegisterData(ade *ade9000.ADE9000Api) {
+func readRegisterData(ade ade9000.ADE9000Interface) {
 	print("AIRMS: ")
 	airms, err := ade.SPI_Read_32bit(ade9000.ADDR_AIRMS)
 	if err != nil {
@@ -101,7 +101,7 @@ func readRegisterData(ade *ade9000.ADE9000Api) {
 	fmt.Printf("%v\n", activePower.ActivePowerReg_A)
 }
 
-func readResampledData(ade *ade9000.ADE9000Api) {
+func readResampledData(ade ade9000.ADE9000Interface) {
 	ade.SPI_Write_16bit(ade9000.ADDR_WFB_CFG, 0x1000)
 	ade.SPI_Write_16bit(ade9000.ADDR_WFB_CFG, 0x1010)
 	time.Sleep(100 * time.Millisecond)
@@ -125,7 +125,7 @@ func readResampledData(ade *ade9000.ADE9000Api) {
 	}
 }
 
-func loop(ade *ade9000.ADE9000Api) {
+func loop(ade ade9000.ADE9000Interface) {
 	for {
 		readRegisterData(ade)
 		readResampledData(ade)
