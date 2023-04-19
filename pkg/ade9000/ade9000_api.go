@@ -184,25 +184,46 @@ func (ade *ADE9000Api) SPI_Init(SPI_speed uint32, chipSelect_Pin string) (spi.Po
 func (ade *ADE9000Api) SPI_Burst_Read_Resampled_Wfb(address uint16, read_Element_Length uint16) (*ResampledWfbData, error) {
 	temp_address := (((address << 4) & 0xFFF0) + 8)
 	var err error
-	read := make([]byte, read_Element_Length*14)
+	read := make([]byte, 2)
 	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
 		return nil, err
 	}
-	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address)}, read); err != nil {
-		return nil, err
-	}
-	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
+	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address)}, nil); err != nil {
 		return nil, err
 	}
 	data := &ResampledWfbData{}
 	for i := uint16(0); i < read_Element_Length; i++ {
-		data.IA_Resampled[i] = int16(read[i*14])<<8 + int16(read[i*14+1])
-		data.VA_Resampled[i] = int16(read[i*14+2])<<8 + int16(read[i*14+3])
-		data.IB_Resampled[i] = int16(read[i*14+4])<<8 + int16(read[i*14+5])
-		data.VB_Resampled[i] = int16(read[i*14+6])<<8 + int16(read[i*14+7])
-		data.IC_Resampled[i] = int16(read[i*14+8])<<8 + int16(read[i*14+9])
-		data.VC_Resampled[i] = int16(read[i*14+10])<<8 + int16(read[i*14+11])
-		data.IN_Resampled[i] = int16(read[i*14+12])<<8 + int16(read[i*14+13])
+		if err = ade.spiConn.Tx([]byte{byte(0x00), byte(0x00)}, read); err != nil {
+			return nil, err
+		}
+		data.IA_Resampled[i] = int16(read[0])<<8 + int16(read[1])
+		if err = ade.spiConn.Tx([]byte{byte(0x00), byte(0x00)}, read); err != nil {
+			return nil, err
+		}
+		data.VA_Resampled[i] = int16(read[0])<<8 + int16(read[1])
+		if err = ade.spiConn.Tx([]byte{byte(0x00), byte(0x00)}, read); err != nil {
+			return nil, err
+		}
+		data.IB_Resampled[i] = int16(read[0])<<8 + int16(read[1])
+		if err = ade.spiConn.Tx([]byte{byte(0x00), byte(0x00)}, read); err != nil {
+			return nil, err
+		}
+		data.VB_Resampled[i] = int16(read[0])<<8 + int16(read[1])
+		if err = ade.spiConn.Tx([]byte{byte(0x00), byte(0x00)}, read); err != nil {
+			return nil, err
+		}
+		data.IC_Resampled[i] = int16(read[0])<<8 + int16(read[1])
+		if err = ade.spiConn.Tx([]byte{byte(0x00), byte(0x00)}, read); err != nil {
+			return nil, err
+		}
+		data.VC_Resampled[i] = int16(read[0])<<8 + int16(read[1])
+		if err = ade.spiConn.Tx([]byte{byte(0x00), byte(0x00)}, read); err != nil {
+			return nil, err
+		}
+		data.IN_Resampled[i] = int16(read[0])<<8 + int16(read[1])
+	}
+	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
+		return nil, err
 	}
 	return data, nil
 }
