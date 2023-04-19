@@ -16,6 +16,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	all := gpioreg.All()
+	for _, pin := range all {
+		fmt.Printf("Pin: %v\n", pin)
+	}
+
 	pm_1 := gpioreg.ByName("PA7")
 	if pm_1 == nil {
 		log.Fatal("Failed to find PA7")
