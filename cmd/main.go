@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"log"
 
+	"periph.io/x/conn/v3/driver/driverreg"
 	"periph.io/x/conn/v3/physic"
 	"periph.io/x/conn/v3/spi"
 	"periph.io/x/conn/v3/spi/spireg"
-	"periph.io/x/host/v3"
 )
 
 func main() {
-	if _, err := host.Init(); err != nil {
+	if _, err := driverreg.Init(); err != nil {
 		log.Fatal(err)
 	}
 	p, err := spireg.Open("")
