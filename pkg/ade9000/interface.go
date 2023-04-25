@@ -3,7 +3,14 @@ package ade9000
 import "periph.io/x/conn/v3/spi"
 
 const (
-	WFB_ELEMENT_ARRAY_SIZE = 512
+	WFB_ELEMENT_ARRAY_SIZE           = 512
+	CALIBRATION_CONSTANTS_ARRAY_SIZE = 13
+	/*Full scale Codes referred from Datasheet.Respective digital codes are produced when ADC inputs are at full scale. Donot Change. */
+	ADE9000_RMS_FULL_SCALE_CODES       = 52702092
+	ADE9000_WATT_FULL_SCALE_CODES      = 20694066
+	ADE9000_RESAMPLED_FULL_SCALE_CODES = 18196
+	ADE9000_PCF_FULL_SCALE_CODES       = 74532013
+	ADE90xx_FDSP                       = 8000
 )
 
 type ResampledWfbData struct {
