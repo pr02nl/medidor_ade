@@ -98,7 +98,10 @@ func (ade *ADE9000Api) SPI_Write_16bit(address uint16, data uint16) error {
 	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
 		return err
 	}
-	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address), byte(data >> 8), byte(data)}, nil); err != nil {
+	if err = ade.spiConn.Tx([]byte{byte(temp_address), byte(temp_address >> 8)}, nil); err != nil {
+		return err
+	}
+	if err = ade.spiConn.Tx([]byte{byte(data), byte(data >> 8)}, nil); err != nil {
 		return err
 	}
 	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
@@ -106,6 +109,7 @@ func (ade *ADE9000Api) SPI_Write_16bit(address uint16, data uint16) error {
 	}
 	return nil
 }
+
 func (ade *ADE9000Api) SPI_Write_32bit(address uint16, data uint32) error {
 	temp_address := ((address << 4) & 0xFFF0)
 	var err error
