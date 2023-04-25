@@ -71,7 +71,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%X\n", read)
+	fmt.Printf("%#X\n", read)
 
 	println("Calibrating...")
 	calibration := ade9000.NewCalibration(ade)
