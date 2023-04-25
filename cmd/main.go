@@ -73,17 +73,17 @@ func main() {
 	}
 	fmt.Printf("%#X\n", read)
 
-	println("Calibrating...")
-	calibration := ade9000.NewCalibration(ade)
-	err = calibration.GetPGA_gain()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = calibration.VGain_calibrate()
-	if err != nil {
-		log.Fatal(err)
-	}
-	loop(ade)
+	// println("Calibrating...")
+	// calibration := ade9000.NewCalibration(ade)
+	// err = calibration.GetPGA_gain()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// err = calibration.VGain_calibrate()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// loop(ade)
 }
 
 func resetADE9000(reset_pin gpio.PinIO) {
