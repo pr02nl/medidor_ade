@@ -2,6 +2,7 @@ package ade9000
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"periph.io/x/conn/v3/gpio"
@@ -144,6 +145,7 @@ func (ade *ADE9000Api) SPI_Read_16bit(address uint16) (uint16, error) {
 	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
 		return 0, err
 	}
+	fmt.Printf("SPI Read 16bit: %x\n", read)
 	return uint16(read[0])<<8 + uint16(read[1]), nil
 }
 
