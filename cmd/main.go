@@ -85,28 +85,28 @@ func resetADE9000(reset_pin gpio.PinIO) {
 }
 
 func readRegisterData(ade ade9000.ADE9000Interface) {
-	print("AIRMS: ")
-	airms, err := ade.SPI_Read_32bit(ade9000.ADDR_AIRMS)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%X\n", airms)
+	// print("AIRMS: ")
+	// airms, err := ade.SPI_Read_32bit(ade9000.ADDR_AIRMS)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("%X\n", airms)
 	voltageRms := ade9000.VoltageRMSRegs{}
-	activePower := ade9000.ActivePowerRegs{}
+	// activePower := ade9000.ActivePowerRegs{}
 	ade.ReadVoltageRMSRegs(&voltageRms)
-	ade.ReadActivePowerRegs(&activePower)
+	// ade.ReadActivePowerRegs(&activePower)
 	print("AVRMS: ")
-	fmt.Printf("%X\n", voltageRms.VoltageRMSReg_A)
+	fmt.Printf("%X ", voltageRms.VoltageRMSReg_A)
 	print("BVRMS: ")
-	fmt.Printf("%X\n", voltageRms.VoltageRMSReg_B)
+	fmt.Printf("%X ", voltageRms.VoltageRMSReg_B)
 	print("CVRMS: ")
 	fmt.Printf("%X\n", voltageRms.VoltageRMSReg_C)
-	print("AWATT: ")
-	fmt.Printf("%X\n", activePower.ActivePowerReg_A)
-	print("BWATT: ")
-	fmt.Printf("%X\n", activePower.ActivePowerReg_B)
-	print("CWATT: ")
-	fmt.Printf("%X\n", activePower.ActivePowerReg_C)
+	// print("AWATT: ")
+	// fmt.Printf("%X\n", activePower.ActivePowerReg_A)
+	// print("BWATT: ")
+	// fmt.Printf("%X\n", activePower.ActivePowerReg_B)
+	// print("CWATT: ")
+	// fmt.Printf("%X\n", activePower.ActivePowerReg_C)
 }
 
 func readResampledData(ade ade9000.ADE9000Interface) {
@@ -137,6 +137,6 @@ func loop(ade ade9000.ADE9000Interface) {
 	for {
 		readRegisterData(ade)
 		// readResampledData(ade)
-		time.Sleep(1000 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 }
