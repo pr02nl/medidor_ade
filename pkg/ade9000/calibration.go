@@ -1,6 +1,7 @@
 package ade9000
 
 import (
+	"fmt"
 	"math"
 	"time"
 )
@@ -62,6 +63,7 @@ func (calibration *Calibration) GetPGA_gain() error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("PGA Gain Register: %#X\n", pgaGainRegister)
 	temp = pgaGainRegister & (0x0003) //extract gain of current channel
 	// 00-->Gain 1: 01-->Gain 2: 10/11-->Gain 4
 	if temp == 0 {
@@ -83,7 +85,7 @@ func (calibration *Calibration) GetPGA_gain() error {
 	return nil
 }
 
-func (calibration *Calibration) iGain_calibrate() error {
+func (calibration *Calibration) IGain_calibrate() error {
 	temp := ADE9000_RMS_FULL_SCALE_CODES * CURRENT_TRANSFER_FUNCTION * float32(calibration.CalCurrentPGA_gain) * NOMINAL_INPUT_CURRENT * math.Sqrt2
 	expectedCodes := int32(temp) //Round off
 	for i := 0; i < IGAIN_CAL_REG_SIZE; i++ {
@@ -97,16 +99,23 @@ func (calibration *Calibration) iGain_calibrate() error {
 	return nil
 }
 
-func (calibration *Calibration) vGain_calibrate() error {
+func (calibration *Calibration) VGain_calibrate() error {
 	temp := ADE9000_RMS_FULL_SCALE_CODES * VOLTAGE_TRANSFER_FUNCTION * float32(calibration.CalVoltagePGA_gain) * NOMINAL_INPUT_VOLTAGE * math.Sqrt2
 	expectedCodes := int32(temp) //Round off
+	fmt.Printf("Expected VRMS Code: %#X\n", expectedCodes)
 	for i := 0; i < VGAIN_CAL_REG_SIZE; i++ {
 		actualCodes, err := calibration.ADE.SPI_Read_32bit(uint16(calibration.XVrms_registers_address[i]))
 		if err != nil {
 			return err
 		}
+		fmt.Printf("CH %d, Actual VRMS Code: %#X\n", i, actualCodes)
 		temp = ((float32(expectedCodes) / float32(actualCodes)) - 1) * 134217728 //calculate the gain.
 		calibration.XVgain_registers[i] = int32(temp)
+		fmt.Printf("CH %d, Voltage Gain Register: %#X\n", i, calibration.XVgain_registers[i])
+		err = calibration.ADE.SPI_Write_32bit(uint16(calibration.XVgain_register_address[i]), uint32(calibration.XVgain_registers[i]))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
