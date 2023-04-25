@@ -116,6 +116,8 @@ func (ade *ADE9000Api) SPI_Read_16bit(address uint16) (uint16, error) {
 	temp_address := (((address << 4) & 0xFFF0) + 8)
 	var err error
 	read := make([]byte, 2)
+	read[0] = 0x00
+	read[1] = 0x00
 	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
 		return 0, err
 	}
