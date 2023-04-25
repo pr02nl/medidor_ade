@@ -94,6 +94,7 @@ func (ade *ADE9000Api) SetupADE9000() error {
 }
 
 func (ade *ADE9000Api) SPI_Write_16bit(address uint16, data uint16) error {
+	fmt.Printf("SPI_Write_16bit: address: %#x, data: %#x\n", address, data)
 	temp_address := ((address << 4) & 0xFFF0)
 	var err error
 	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
@@ -103,24 +104,6 @@ func (ade *ADE9000Api) SPI_Write_16bit(address uint16, data uint16) error {
 		return err
 	}
 	if err = ade.spiConn.Tx([]byte{byte(data), byte(data >> 8)}, nil); err != nil {
-		return err
-	}
-	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ade *ADE9000Api) SPI_Write_32bit(address uint16, data uint32) error {
-	temp_address := ((address << 4) & 0xFFF0)
-	var err error
-	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
-		return err
-	}
-	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address)}, nil); err != nil {
-		return err
-	}
-	if err = ade.spiConn.Tx([]byte{byte(data >> 24), byte(data >> 16), byte(data >> 8), byte(data)}, nil); err != nil {
 		return err
 	}
 	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
@@ -145,8 +128,25 @@ func (ade *ADE9000Api) SPI_Read_16bit(address uint16) (uint16, error) {
 	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
 		return 0, err
 	}
-	fmt.Printf("SPI Read 16bit: %x\n", read)
 	return uint16(read[0])<<8 + uint16(read[1]), nil
+}
+
+func (ade *ADE9000Api) SPI_Write_32bit(address uint16, data uint32) error {
+	temp_address := ((address << 4) & 0xFFF0)
+	var err error
+	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
+		return err
+	}
+	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address)}, nil); err != nil {
+		return err
+	}
+	if err = ade.spiConn.Tx([]byte{byte(data >> 24), byte(data >> 16), byte(data >> 8), byte(data)}, nil); err != nil {
+		return err
+	}
+	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ade *ADE9000Api) SPI_Read_32bit(address uint16) (uint32, error) {
