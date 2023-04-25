@@ -66,12 +66,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	print("RUN Register: ")
 	read, err := ade.SPI_Read_16bit(ade9000.ADDR_RUN)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%#X\n", read)
+	fmt.Printf("RUN Register: %#X\n", read)
 
 	// println("Calibrating...")
 	// calibration := ade9000.NewCalibration(ade)
