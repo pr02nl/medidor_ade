@@ -109,6 +109,11 @@ func (calibration *Calibration) VGain_calibrate() error {
 			return err
 		}
 		fmt.Printf("CH %d, Actual VRMS Code: %#X\n", i, actualCodes)
+		actualGain, err := calibration.ADE.SPI_Read_32bit(uint16(calibration.XVgain_register_address[i]))
+		if err != nil {
+			return err
+		}
+		fmt.Printf("CH %d, Actual Voltage Gain Register: %#X\n", i, actualGain)
 		temp = ((float32(expectedCodes) / float32(actualCodes)) - 1) * 134217728 //calculate the gain.
 		calibration.XVgain_registers[i] = int32(temp)
 		fmt.Printf("CH %d, Voltage Gain Register: %#X\n", i, calibration.XVgain_registers[i])
