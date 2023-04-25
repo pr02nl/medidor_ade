@@ -112,7 +112,10 @@ func (ade *ADE9000Api) SPI_Write_32bit(address uint16, data uint32) error {
 	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
 		return err
 	}
-	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address), byte(data >> 24), byte(data >> 16), byte(data >> 8), byte(data)}, nil); err != nil {
+	if err = ade.spiConn.Tx([]byte{byte(temp_address >> 8), byte(temp_address)}, nil); err != nil {
+		return err
+	}
+	if err = ade.spiConn.Tx([]byte{byte(data >> 24), byte(data >> 16), byte(data >> 8), byte(data)}, nil); err != nil {
 		return err
 	}
 	if err = ade.chipSelect_Pin.Out(gpio.High); err != nil {
