@@ -41,7 +41,7 @@ func main() {
 		fmt.Printf("Pin: %v\n", pin)
 	}
 
-	red := gpioreg.ByName("GPIO015")
+	red := gpioreg.ByName("GPIO15")
 	if red == nil {
 		log.Fatal("Failed to find " + "GPIO015")
 	}
