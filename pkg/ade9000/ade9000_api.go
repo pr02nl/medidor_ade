@@ -183,7 +183,7 @@ func (ade *ADE9000Api) SPI_Init(SPI_speed uint32, chipSelect_Pin string) (spi.Po
 		return nil, err
 	}
 	// Convert the spi.Port into a spi.Conn so it can be used for communication.
-	c, err := p.Connect(physic.MegaHertz, spi.Mode3, 8)
+	c, err := p.Connect(physic.MegaHertz, spi.Mode0, 8)
 	if err != nil {
 		return nil, err
 	}
