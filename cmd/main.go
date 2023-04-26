@@ -36,10 +36,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// all := gpioreg.All()
-	// for _, pin := range all {
-	// 	fmt.Printf("Pin: %v\n", pin)
-	// }
+	all := gpioreg.All()
+	for _, pin := range all {
+		fmt.Printf("Pin: %v\n", pin)
+	}
 
 	red := gpioreg.ByName("GPIO015")
 	if red == nil {
