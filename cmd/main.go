@@ -41,36 +41,46 @@ func main() {
 	// 	fmt.Printf("Pin: %v\n", pin)
 	// }
 
-	pm_1 := gpioreg.ByName(PM_1)
-	if pm_1 == nil {
-		log.Fatal("Failed to find " + PM_1)
+	red := gpioreg.ByName("GPIO015")
+	if red == nil {
+		log.Fatal("Failed to find " + "GPIO015")
 	}
-	pm_1.Out(gpio.Low)
-	reset_pin := gpioreg.ByName(ADE9000_RESET_PIN)
-	if reset_pin == nil {
-		log.Fatal("Failed to find " + ADE9000_RESET_PIN)
-	}
-	reset_pin.Out(gpio.High)
-	resetADE9000(reset_pin)
-	time.Sleep(100 * time.Millisecond)
-
-	ade := ade9000.NewADE9000Api()
-	spi, err := ade.SPI_Init(1, CS)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer spi.Close()
-
-	err = ade.SetupADE9000()
-	if err != nil {
-		log.Fatal(err)
+	for {
+		red.Out(gpio.High)
+		time.Sleep(500 * time.Millisecond)
+		red.Out(gpio.Low)
 	}
 
-	read, err := ade.SPI_Read_16bit(ade9000.ADDR_RUN)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("RUN Register: %#X\n", read)
+	// pm_1 := gpioreg.ByName(PM_1)
+	// if pm_1 == nil {
+	// 	log.Fatal("Failed to find " + PM_1)
+	// }
+	// pm_1.Out(gpio.Low)
+	// reset_pin := gpioreg.ByName(ADE9000_RESET_PIN)
+	// if reset_pin == nil {
+	// 	log.Fatal("Failed to find " + ADE9000_RESET_PIN)
+	// }
+	// reset_pin.Out(gpio.High)
+	// resetADE9000(reset_pin)
+	// time.Sleep(100 * time.Millisecond)
+
+	// ade := ade9000.NewADE9000Api()
+	// spi, err := ade.SPI_Init(1, CS)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer spi.Close()
+
+	// err = ade.SetupADE9000()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// read, err := ade.SPI_Read_16bit(ade9000.ADDR_RUN)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("RUN Register: %#X\n", read)
 
 	// println("Calibrating...")
 	// calibration := ade9000.NewCalibration(ade)
