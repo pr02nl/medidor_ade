@@ -88,6 +88,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	time.Sleep(500 * time.Millisecond)
 	err = calibration.VGain_calibrate()
 	if err != nil {
 		log.Fatal(err)
