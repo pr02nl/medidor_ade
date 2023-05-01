@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"time"
 
 	"github.com/pr02nl/medidor_ade/pkg/ade9000"
@@ -111,16 +112,20 @@ func readRegisterData(ade ade9000.ADE9000Interface) {
 	// 	log.Fatal(err)
 	// }
 	// fmt.Printf("%X\n", airms)
-	voltageRms := ade9000.VoltageRMSRegs{}
+	voltageRmsRegs := ade9000.VoltageRMSRegs{}
+	voltageRms := ade9000.VoltageRMS{}
 	// activePower := ade9000.ActivePowerRegs{}
-	ade.ReadVoltageRMSRegs(&voltageRms)
+	ade.ReadVoltageRMSRegs(&voltageRmsRegs)
 	// ade.ReadActivePowerRegs(&activePower)
+	voltageRms.VoltageRMS_A = (float64(voltageRmsRegs.VoltageRMSReg_A) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
+	voltageRms.VoltageRMS_B = (float64(voltageRmsRegs.VoltageRMSReg_B) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
+	voltageRms.VoltageRMS_C = (float64(voltageRmsRegs.VoltageRMSReg_C) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
 	print("AVRMS: ")
-	fmt.Printf("%#X ", uint32(voltageRms.VoltageRMSReg_A))
+	fmt.Printf("%f ", voltageRms.VoltageRMS_A)
 	print("BVRMS: ")
-	fmt.Printf("%#X ", uint32(voltageRms.VoltageRMSReg_B))
+	fmt.Printf("%f ", voltageRms.VoltageRMS_B)
 	print("CVRMS: ")
-	fmt.Printf("%#X\n", uint32(voltageRms.VoltageRMSReg_C))
+	fmt.Printf("%f\n", voltageRms.VoltageRMS_C)
 	// print("AWATT: ")
 	// fmt.Printf("%X\n", activePower.ActivePowerReg_A)
 	// print("BWATT: ")
