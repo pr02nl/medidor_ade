@@ -46,6 +46,11 @@ type VoltageRMSRegs struct {
 	VoltageRMSReg_B int32
 	VoltageRMSReg_C int32
 }
+type VoltageRMS struct {
+	VoltageRMS_A float64
+	VoltageRMS_B float64
+	VoltageRMS_C float64
+}
 
 type CurrentRMSRegs struct {
 	CurrentRMSReg_A int32
