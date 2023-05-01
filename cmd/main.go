@@ -36,63 +36,63 @@ func main() {
 		log.Fatal(err)
 	}
 
-	all := gpioreg.All()
-	for _, pin := range all {
-		fmt.Printf("Pin: %v\n", pin)
+	// all := gpioreg.All()
+	// for _, pin := range all {
+	// 	fmt.Printf("Pin: %v\n", pin)
+	// }
+
+	// red := gpioreg.ByName("GPIO15")
+	// if red == nil {
+	// 	log.Fatal("Failed to find " + "GPIO15")
+	// }
+	// for {
+	// 	red.Out(gpio.High)
+	// 	time.Sleep(500 * time.Millisecond)
+	// 	red.Out(gpio.Low)
+	// }
+
+	pm_1 := gpioreg.ByName(PM_1)
+	if pm_1 == nil {
+		log.Fatal("Failed to find " + PM_1)
+	}
+	pm_1.Out(gpio.Low)
+	reset_pin := gpioreg.ByName(ADE9000_RESET_PIN)
+	if reset_pin == nil {
+		log.Fatal("Failed to find " + ADE9000_RESET_PIN)
+	}
+	reset_pin.Out(gpio.High)
+	resetADE9000(reset_pin)
+	time.Sleep(100 * time.Millisecond)
+
+	ade := ade9000.NewADE9000Api()
+	spi, err := ade.SPI_Init(1, CS)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer spi.Close()
+
+	err = ade.SetupADE9000()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	red := gpioreg.ByName("GPIO15")
-	if red == nil {
-		log.Fatal("Failed to find " + "GPIO015")
+	read, err := ade.SPI_Read_16bit(ade9000.ADDR_RUN)
+	if err != nil {
+		log.Fatal(err)
 	}
-	for {
-		red.Out(gpio.High)
-		time.Sleep(500 * time.Millisecond)
-		red.Out(gpio.Low)
+	fmt.Printf("RUN Register: %#X\n", read)
+
+	println("Calibrating...")
+	calibration := ade9000.NewCalibration(ade)
+	err = calibration.GetPGA_gain()
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	// pm_1 := gpioreg.ByName(PM_1)
-	// if pm_1 == nil {
-	// 	log.Fatal("Failed to find " + PM_1)
-	// }
-	// pm_1.Out(gpio.Low)
-	// reset_pin := gpioreg.ByName(ADE9000_RESET_PIN)
-	// if reset_pin == nil {
-	// 	log.Fatal("Failed to find " + ADE9000_RESET_PIN)
-	// }
-	// reset_pin.Out(gpio.High)
-	// resetADE9000(reset_pin)
-	// time.Sleep(100 * time.Millisecond)
-
-	// ade := ade9000.NewADE9000Api()
-	// spi, err := ade.SPI_Init(1, CS)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer spi.Close()
-
-	// err = ade.SetupADE9000()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// read, err := ade.SPI_Read_16bit(ade9000.ADDR_RUN)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("RUN Register: %#X\n", read)
-
-	// println("Calibrating...")
-	// calibration := ade9000.NewCalibration(ade)
-	// err = calibration.GetPGA_gain()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// err = calibration.VGain_calibrate()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// loop(ade)
+	err = calibration.VGain_calibrate()
+	if err != nil {
+		log.Fatal(err)
+	}
+	loop(ade)
 }
 
 func resetADE9000(reset_pin gpio.PinIO) {
