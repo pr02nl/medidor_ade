@@ -29,6 +29,12 @@ type ActivePowerRegs struct {
 	ActivePowerReg_C int32
 }
 
+type Power struct {
+	Power_A float64
+	Power_B float64
+	Power_C float64
+}
+
 type ReactivePowerRegs struct {
 	ReactivePowerReg_A int32
 	ReactivePowerReg_B int32
@@ -50,6 +56,12 @@ type VoltageRMS struct {
 	VoltageRMS_A float64
 	VoltageRMS_B float64
 	VoltageRMS_C float64
+}
+type CurrentRMS struct {
+	CurrentRMS_A float64
+	CurrentRMS_B float64
+	CurrentRMS_C float64
+	CurrentRMS_N float64
 }
 
 type CurrentRMSRegs struct {
