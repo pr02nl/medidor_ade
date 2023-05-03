@@ -112,14 +112,43 @@ func readRegisterData(ade ade9000.ADE9000Interface) {
 	// 	log.Fatal(err)
 	// }
 	// fmt.Printf("%X\n", airms)
-	voltageRmsRegs := ade9000.VoltageRMSRegs{}
 	voltageRms := ade9000.VoltageRMS{}
-	// activePower := ade9000.ActivePowerRegs{}
+	currentRms := ade9000.CurrentRMS{}
+	activePower := ade9000.Power{}
+	reactivePower := ade9000.Power{}
+	aparentPower := ade9000.Power{}
+	voltageRmsRegs := ade9000.VoltageRMSRegs{}
+	currentRmsRegs := ade9000.CurrentRMSRegs{}
+	activePowerRegs := ade9000.ActivePowerRegs{}
+	aparentPowerRegs := ade9000.ApparentPowerRegs{}
+	reactivePowerRegs := ade9000.ReactivePowerRegs{}
+	powerFactorRegs := ade9000.PowerFactorRegs{}
 	ade.ReadVoltageRMSRegs(&voltageRmsRegs)
-	// ade.ReadActivePowerRegs(&activePower)
+	ade.ReadActivePowerRegs(&activePowerRegs)
+	ade.ReadCurrentRMSRegs(&currentRmsRegs)
+	ade.ReadApparentPowerRegs(&aparentPowerRegs)
+	ade.ReadReactivePowerRegs(&reactivePowerRegs)
+	ade.ReadPowerFactorRegsnValues(&powerFactorRegs)
 	voltageRms.VoltageRMS_A = (float64(voltageRmsRegs.VoltageRMSReg_A) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
 	voltageRms.VoltageRMS_B = (float64(voltageRmsRegs.VoltageRMSReg_B) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
 	voltageRms.VoltageRMS_C = (float64(voltageRmsRegs.VoltageRMSReg_C) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
+
+	currentRms.CurrentRMS_A = (float64(currentRmsRegs.CurrentRMSReg_A) * ade9000.CAL_IRMS_CC) / math.Pow10(6)
+	currentRms.CurrentRMS_B = (float64(currentRmsRegs.CurrentRMSReg_B) * ade9000.CAL_IRMS_CC) / math.Pow10(6)
+	currentRms.CurrentRMS_C = (float64(currentRmsRegs.CurrentRMSReg_C) * ade9000.CAL_IRMS_CC) / math.Pow10(6)
+
+	activePower.Power_A = (float64(activePowerRegs.ActivePowerReg_A) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+	activePower.Power_B = (float64(activePowerRegs.ActivePowerReg_B) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+	activePower.Power_C = (float64(activePowerRegs.ActivePowerReg_C) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+
+	reactivePower.Power_A = (float64(reactivePowerRegs.ReactivePowerReg_A) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+	reactivePower.Power_B = (float64(reactivePowerRegs.ReactivePowerReg_B) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+	reactivePower.Power_C = (float64(reactivePowerRegs.ReactivePowerReg_C) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+
+	aparentPower.Power_A = (float64(aparentPowerRegs.ApparentPowerReg_A) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+	aparentPower.Power_B = (float64(aparentPowerRegs.ApparentPowerReg_B) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+	aparentPower.Power_C = (float64(aparentPowerRegs.ApparentPowerReg_C) * ade9000.CAL_POWER_CC) / math.Pow10(3)
+
 	print("AVRMS: ")
 	fmt.Printf("%f ", voltageRms.VoltageRMS_A)
 	print("BVRMS: ")
