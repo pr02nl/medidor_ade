@@ -7,12 +7,13 @@ import (
 )
 
 const (
-	IGAIN_CAL_REG_SIZE = 4
-	VGAIN_CAL_REG_SIZE = 3
-	PHCAL_CAL_REG_SIZE = 3
-	PGAIN_CAL_REG_SIZE = 3
-	EGY_REG_SIZE       = 3
-	ACCUMULATION_TIME  = 5
+	IGAIN_CAL_REG_SIZE  = 4
+	VGAIN_CAL_REG_SIZE  = 3
+	PHCAL_CAL_REG_SIZE  = 3
+	PGAIN_CAL_REG_SIZE  = 3
+	EGY_REG_SIZE        = 3
+	ACCUMULATION_TIME   = 5
+	EGY_INTERRUPT_MASK0 = 1
 )
 
 type Calibration struct {
@@ -88,13 +89,25 @@ func (calibration *Calibration) GetPGA_gain() error {
 func (calibration *Calibration) IGain_calibrate() error {
 	temp := ADE9000_RMS_FULL_SCALE_CODES * CURRENT_TRANSFER_FUNCTION * float32(calibration.CalCurrentPGA_gain) * NOMINAL_INPUT_CURRENT * math.Sqrt2
 	expectedCodes := int32(temp) //Round off
+	fmt.Printf("Expected IRMS Code: %#X\n", expectedCodes)
 	for i := 0; i < IGAIN_CAL_REG_SIZE; i++ {
 		actualCodes, err := calibration.ADE.SPI_Read_32bit(uint16(calibration.XIrms_registers_address[i]))
 		if err != nil {
 			return err
 		}
+		fmt.Printf("CH %d, Actual IRMS Code: %#X\n", i, actualCodes)
+		actualGain, err := calibration.ADE.SPI_Read_32bit(uint16(calibration.XIgain_register_address[i]))
+		if err != nil {
+			return err
+		}
+		fmt.Printf("CH %d, Actual Current Gain Register: %#X\n", i, actualGain)
 		temp = ((float32(expectedCodes) / float32(actualCodes)) - 1) * 134217728 //calculate the gain.
 		calibration.XIgain_registers[i] = int32(temp)
+		fmt.Printf("CH %d, Current Gain Register: %#X\n", i, calibration.XIgain_registers[i])
+		err = calibration.ADE.SPI_Write_32bit(uint16(calibration.XIgain_register_address[i]), uint32(calibration.XIgain_registers[i]))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
