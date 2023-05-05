@@ -106,12 +106,6 @@ func resetADE9000(reset_pin gpio.PinIO) {
 }
 
 func readRegisterData(ade ade9000.ADE9000Interface) {
-	// print("AIRMS: ")
-	// airms, err := ade.SPI_Read_32bit(ade9000.ADDR_AIRMS)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%X\n", airms)
 	voltageRms := ade9000.VoltageRMS{}
 	currentRms := ade9000.CurrentRMS{}
 	activePower := ade9000.Power{}
@@ -123,12 +117,18 @@ func readRegisterData(ade ade9000.ADE9000Interface) {
 	aparentPowerRegs := ade9000.ApparentPowerRegs{}
 	reactivePowerRegs := ade9000.ReactivePowerRegs{}
 	powerFactorRegs := ade9000.PowerFactorRegs{}
+	periodRegs := ade9000.PeriodRegs{}
+	angleRegs := ade9000.AngleRegs{}
+	tempRegs := ade9000.TemperatureRegnValue{}
 	ade.ReadVoltageRMSRegs(&voltageRmsRegs)
-	ade.ReadActivePowerRegs(&activePowerRegs)
 	ade.ReadCurrentRMSRegs(&currentRmsRegs)
-	ade.ReadApparentPowerRegs(&aparentPowerRegs)
+	ade.ReadActivePowerRegs(&activePowerRegs)
 	ade.ReadReactivePowerRegs(&reactivePowerRegs)
+	ade.ReadApparentPowerRegs(&aparentPowerRegs)
 	ade.ReadPowerFactorRegsnValues(&powerFactorRegs)
+	ade.ReadPeriodRegsnValues(&periodRegs)
+	ade.ReadAngleRegsnValues(&angleRegs)
+	ade.ReadTempRegnValue(&tempRegs)
 	voltageRms.VoltageRMS_A = (float64(voltageRmsRegs.VoltageRMSReg_A) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
 	voltageRms.VoltageRMS_B = (float64(voltageRmsRegs.VoltageRMSReg_B) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
 	voltageRms.VoltageRMS_C = (float64(voltageRmsRegs.VoltageRMSReg_C) * ade9000.CAL_VRMS_CC) / math.Pow10(6)
@@ -155,12 +155,6 @@ func readRegisterData(ade ade9000.ADE9000Interface) {
 	fmt.Printf("%f ", voltageRms.VoltageRMS_B)
 	print("CVRMS: ")
 	fmt.Printf("%f\n", voltageRms.VoltageRMS_C)
-	// print("AWATT: ")
-	// fmt.Printf("%X\n", activePower.ActivePowerReg_A)
-	// print("BWATT: ")
-	// fmt.Printf("%X\n", activePower.ActivePowerReg_B)
-	// print("CWATT: ")
-	// fmt.Printf("%X\n", activePower.ActivePowerReg_C)
 }
 
 func readResampledData(ade ade9000.ADE9000Interface) {
