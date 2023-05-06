@@ -19,9 +19,6 @@ func NewCalibratePowerUseCase(medidorRepository entity.MedidorRepositoryInterfac
 func (u *CalibratePowerUseCase) Execute() error {
 	println("Calibrating Power...")
 	calibration := ade9000.NewCalibration(u.ade9000)
-	if err := calibration.GetPGA_gain(); err != nil {
-		return err
-	}
 	time.Sleep(500 * time.Millisecond)
 	if err := calibration.PGain_calibrate(1); err != nil {
 		return err
