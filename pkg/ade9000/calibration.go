@@ -1,9 +1,13 @@
 package ade9000
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"time"
+
+	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/conn/v3/gpio/gpioreg"
 )
 
 const (
@@ -14,6 +18,7 @@ const (
 	EGY_REG_SIZE        = 3
 	ACCUMULATION_TIME   = 5
 	EGY_INTERRUPT_MASK0 = 1
+	IRQ0                = "GPIO10"
 )
 
 type Calibration struct {
@@ -194,6 +199,17 @@ func (u *Calibration) calibrationEnergyRegisterSetup() error {
 	}
 	time.Sleep(2 * time.Second)
 	u.ADE.SPI_Write_32bit(ADDR_STATUS0, 0xFFFFFFFF) //Clear all interrupts
+
+	p := gpioreg.ByName(IRQ0)
+	if p == nil {
+		return errors.New("Failed to find IRQ0")
+	}
+	if err := p.In(gpio.PullDown, gpio.FallingEdge); err != nil {
+		return err
+	}
+	for p.WaitForEdge(-1) {
+		fmt.Printf("%s went %s\n", p, gpio.High)
+	}
 	return nil
 }
 
