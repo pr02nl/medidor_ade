@@ -26,10 +26,10 @@ const (
 	CS                = "GPIO8"
 	PM_1              = "GPIO7"
 	ADE9000_RESET_PIN = "GPIO9"
-	IRQ0              = "GPIO10"
-	IRQ1              = "GPIO20"
-	CF4_DREADY_EVENT  = "GPIO68"
-	CF3_ZX            = "GPIO71"
+	// IRQ0              = "GPIO10"
+	IRQ1             = "GPIO20"
+	CF4_DREADY_EVENT = "GPIO68"
+	CF3_ZX           = "GPIO71"
 )
 
 func main() {
