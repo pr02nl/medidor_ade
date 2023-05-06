@@ -36,6 +36,7 @@ type Calibration struct {
 	XPgain_register_address             [PGAIN_CAL_REG_SIZE]int32
 	AccumulatedActiveEnergy_registers   [EGY_REG_SIZE]int32
 	AccumulatedReactiveEnergy_registers [EGY_REG_SIZE]int32
+	accTime                             int
 	CalCurrentPGA_gain                  int8
 	CalVoltagePGA_gain                  int8
 	CalibrationDataToEEPROM             [CALIBRATION_CONSTANTS_ARRAY_SIZE]uint32
@@ -54,6 +55,7 @@ func NewCalibration(ade9000Api ADE9000Interface) *Calibration {
 		XPgain_register_address:     [PGAIN_CAL_REG_SIZE]int32{ADDR_APGAIN, ADDR_BPGAIN, ADDR_CPGAIN},
 		CalCurrentPGA_gain:          0,
 		CalVoltagePGA_gain:          0,
+		accTime:                     0,
 	}
 }
 
@@ -151,6 +153,10 @@ func (calibration *Calibration) Phase_calibrate() error {
 		errorAngle := -1 * math.Atan((float64(actualActiveEnergyCode)*math.Sin(calibration.DegreesToRadians(CALIBRATION_ANGLE_DEGREES))-float64(actualReactiveEnergyCode)*math.Cos(calibration.DegreesToRadians(CALIBRATION_ANGLE_DEGREES)))/(float64(actualActiveEnergyCode)*math.Cos(calibration.DegreesToRadians(CALIBRATION_ANGLE_DEGREES))+float64(actualReactiveEnergyCode)*math.Sin(calibration.DegreesToRadians(CALIBRATION_ANGLE_DEGREES))))
 		temp := ((math.Sin(errorAngle-omega) + math.Sin(omega)) / (math.Sin(2*omega - errorAngle))) * 134217728
 		calibration.XPhcal_registers[i] = int32(temp)
+		err := calibration.ADE.SPI_Write_32bit(uint16(calibration.XPhcal_register_address[i]), uint32(calibration.XPhcal_registers[i]))
+		if err != nil {
+			return nil
+		}
 	}
 	return nil
 }
@@ -163,6 +169,63 @@ func (calibration *Calibration) PGain_calibrate(pGaincalPF float32) error {
 		actualActiveEnergyCode := calibration.AccumulatedActiveEnergy_registers[i]
 		temp = ((float32(expectedActiveEnergyCode) / float32(actualActiveEnergyCode)) - 1) * 134217728 //calculate the gain.
 		calibration.XPgain_registers[i] = int32(temp)
+		err := calibration.ADE.SPI_Write_32bit(uint16(calibration.XPgain_register_address[i]), uint32(calibration.XPgain_registers[i]))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (u *Calibration) calibrationEnergyRegisterSetup() error {
+	if err := u.ADE.SPI_Write_32bit(ADDR_MASK0, EGY_INTERRUPT_MASK0); err != nil { //Enable EGYRDY interrupt
+		return err
+	}
+	if err := u.ADE.SPI_Write_16bit(ADDR_EGY_TIME, EGYACCTIME); err != nil { //accumulate EGY_TIME+1 samples (8000 = 1sec)
+		return err
+	}
+	epcfgRegister, err := u.ADE.SPI_Read_16bit(ADDR_EP_CFG) //Read EP_CFG register
+	if err != nil {
+		return err
+	}
+	epcfgRegister |= CALIBRATION_EGY_CFG //Write the settings and enable accumulation
+	if err = u.ADE.SPI_Write_16bit(ADDR_EP_CFG, epcfgRegister); err != nil {
+		return err
+	}
+	time.Sleep(2 * time.Second)
+	u.ADE.SPI_Write_32bit(ADDR_STATUS0, 0xFFFFFFFF) //Clear all interrupts
+	return nil
+}
+
+func (c *Calibration) updateEnergyRegisterFromInterrupt() error {
+	temp, err := c.ADE.SPI_Read_32bit(ADDR_STATUS0)
+	if err != nil {
+		return err
+	}
+	temp &= EGY_INTERRUPT_MASK0
+	if temp == EGY_INTERRUPT_MASK0 {
+		c.ADE.SPI_Write_32bit(ADDR_STATUS0, 0xFFFFFFFF)
+		for i := 0; i < EGY_REG_SIZE; i++ {
+			reg, err := c.ADE.SPI_Read_32bit(uint16(c.XWATTHRHI_registers_address[i]))
+			if err != nil {
+				return err
+			}
+			c.AccumulatedActiveEnergy_registers[i] += int32(reg)
+			reg, err = c.ADE.SPI_Read_32bit(uint16(c.XVARHRHI_registers_address[i]))
+			if err != nil {
+				return err
+			}
+			c.AccumulatedReactiveEnergy_registers[i] += int32(reg)
+		}
+		if c.accTime == (ACCUMULATION_TIME - 1) {
+			for i := 0; i < EGY_REG_SIZE; i++ {
+				c.AccumulatedActiveEnergy_registers[i] = 0
+				c.AccumulatedReactiveEnergy_registers[i] = 0
+			}
+			c.accTime = 0
+			return nil
+		}
+		c.accTime++
 	}
 	return nil
 }
