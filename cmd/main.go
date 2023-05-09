@@ -145,7 +145,8 @@ func main() {
 
 func calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) error {
 	var calibration string
-	fmt.Scanf("Medidor ainda não calibrado, deseja iniciar a calibração agora? %s", &calibration)
+	fmt.Println("Medidor ainda não calibrado, deseja iniciar a calibração agora?")
+	fmt.Scanln(&calibration)
 	if calibration == "s" || calibration == "S" {
 		calibration := ade9000.NewCalibration(ade)
 		err := calibration.GetPGA_gain()
@@ -161,7 +162,7 @@ func calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) error {
 			return err
 		}
 	} else {
-		return errors.New("calibração cancelada")
+		return errors.New("calibração cancelada: " + calibration)
 	}
 	return nil
 }
