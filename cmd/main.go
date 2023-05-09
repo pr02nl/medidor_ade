@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/pr02nl/medidor_ade/internal/entity"
 	"github.com/pr02nl/medidor_ade/internal/infra/database"
 	"github.com/pr02nl/medidor_ade/internal/usecases"
 	"github.com/pr02nl/medidor_ade/pkg/ade9000"
@@ -93,7 +94,28 @@ func main() {
 	loadUseCase := usecases.NewLoadMedidorUseCase(medidorRepository)
 	medidor, err := loadUseCase.Execute()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		medidor = &entity.Medidor{
+			NominalVoltage:    ade9000.NOMINAL_INPUT_VOLTAGE,
+			NominalCurrent:    ade9000.NOMINAL_INPUT_CURRENT,
+			Frequency:         ade9000.INPUT_FREQUENCY,
+			CurrentTransfer:   ade9000.CURRENT_TRANSFER_FUNCTION,
+			VoltageTransfer:   ade9000.VOLTAGE_TRANSFER_FUNCTION,
+			CalIrmsCC:         ade9000.CAL_IRMS_CC,
+			CalVrmsCC:         ade9000.CAL_VRMS_CC,
+			CalPwrCC:          ade9000.CAL_POWER_CC,
+			CalEnergyCC:       ade9000.CAL_ENERGY_CC,
+			CalibratedVoltage: false,
+			CalibratedCurrent: false,
+			CalibratedPower:   false,
+			CalibratedPhase:   false,
+		}
+		log.Print("Creating medidor...")
+		createUseCase := usecases.NewCreateMedidorUseCase(medidorRepository)
+		medidor, err = createUseCase.Execute(medidor)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	fmt.Printf("Medidor: %+v\n", medidor.ID)
 
@@ -110,6 +132,14 @@ func main() {
 	// }
 	// loop(ade)
 }
+
+// func calibration() {
+// 	var calibration string
+// 	fmt.Scanf("Medidor ainda não calibrado, deseja iniciar a calibração agora? %s", &calibration)
+// 	if calibration == "s" || calibration == "S" {
+
+// 	}
+// }
 
 func resetADE9000(reset_pin gpio.PinIO) {
 	reset_pin.Out(gpio.Low)
