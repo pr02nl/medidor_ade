@@ -4,6 +4,7 @@ import "time"
 
 type Medicao struct {
 	ID              string    `json:"id"`
+	MedidorID       string    `json:"medidor_id"`
 	DateTime        time.Time `json:"datetime"`
 	VoltageRMS_A    float64   `json:"voltage_rms_a"`
 	VoltageRMS_B    float64   `json:"voltage_rms_b"`
