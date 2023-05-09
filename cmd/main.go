@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/pr02nl/medidor_ade/configs"
 	"github.com/pr02nl/medidor_ade/internal/infra/database"
 	"github.com/pr02nl/medidor_ade/internal/usecases"
 	"github.com/pr02nl/medidor_ade/pkg/ade9000"
@@ -44,19 +43,14 @@ func main() {
 		log.Fatal(err)
 	}
 	println("Host initialized")
-	println("Loading configs...")
-	configs, err := configs.LoadConfig(".")
-	if err != nil {
-		panic(err)
-	}
-	println("Configs loaded")
+	// println("Loading configs...")
+	// configs, err := configs.LoadConfig(".")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// println("Configs loaded")
 	println("Connecting to database...")
-	db, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-		configs.DBUser,
-		configs.DBPassword,
-		configs.DBHost,
-		configs.DBPort,
-		configs.DBName))
+	db, err := sql.Open("sqlite3", "medidor.db")
 	if err != nil {
 		panic(err)
 	}
