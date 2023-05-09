@@ -207,13 +207,21 @@ func (u *Calibration) calibrationEnergyRegisterSetup() error {
 	if err := p.In(gpio.PullDown, gpio.FallingEdge); err != nil {
 		return err
 	}
-	for p.WaitForEdge(-1) {
-		fmt.Printf("%s went %s\n", p, gpio.High)
-	}
+	go u.loopInt(p)
 	return nil
 }
 
+func (c *Calibration) loopInt(p gpio.PinIO) {
+	for p.WaitForEdge(2 * time.Second) {
+		err := c.updateEnergyRegisterFromInterrupt()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
 func (c *Calibration) updateEnergyRegisterFromInterrupt() error {
+	fmt.Println("Interrupt")
 	temp, err := c.ADE.SPI_Read_32bit(ADDR_STATUS0)
 	if err != nil {
 		return err
