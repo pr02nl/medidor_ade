@@ -119,6 +119,12 @@ func main() {
 	}
 	fmt.Printf("Medidor: %+v\n", medidor.ID)
 
+	if medidor.CalibratedVoltage && medidor.CalibratedCurrent && medidor.CalibratedPower && medidor.CalibratedPhase {
+		log.Println("Medidor já calibrado!")
+	} else {
+		calibration(ade, *medidor)
+	}
+
 	// println("Calibrating...")
 	// calibration := ade9000.NewCalibration(ade)
 	// err = calibration.GetPGA_gain()
@@ -133,13 +139,26 @@ func main() {
 	// loop(ade)
 }
 
-// func calibration() {
-// 	var calibration string
-// 	fmt.Scanf("Medidor ainda não calibrado, deseja iniciar a calibração agora? %s", &calibration)
-// 	if calibration == "s" || calibration == "S" {
-
-// 	}
-// }
+func calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) error {
+	var calibration string
+	fmt.Scanf("Medidor ainda não calibrado, deseja iniciar a calibração agora? %s", &calibration)
+	if calibration == "s" || calibration == "S" {
+		calibration := ade9000.NewCalibration(ade)
+		err := calibration.GetPGA_gain()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Adicione uma tensão de %vV e tecle enter", medidor.NominalVoltage)
+		fmt.Scan(calibration)
+		time.Sleep(500 * time.Millisecond)
+		println("Calibrating...")
+		err = calibration.VGain_calibrate()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func resetADE9000(reset_pin gpio.PinIO) {
 	reset_pin.Out(gpio.Low)
