@@ -39,13 +39,18 @@ const (
 )
 
 func main() {
+	println("Starting...")
 	if _, err := host.Init(); err != nil {
 		log.Fatal(err)
 	}
+	println("Host initialized")
+	println("Loading configs...")
 	configs, err := configs.LoadConfig(".")
 	if err != nil {
 		panic(err)
 	}
+	println("Configs loaded")
+	println("Connecting to database...")
 	db, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		configs.DBUser,
 		configs.DBPassword,
@@ -55,6 +60,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	println("Database connected")
 	defer db.Close()
 
 	pm_1 := gpioreg.ByName(PM_1)
