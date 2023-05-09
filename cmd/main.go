@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -122,7 +123,10 @@ func main() {
 	if medidor.CalibratedVoltage && medidor.CalibratedCurrent && medidor.CalibratedPower && medidor.CalibratedPhase {
 		log.Println("Medidor já calibrado!")
 	} else {
-		calibration(ade, *medidor)
+		err = calibration(ade, *medidor)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// println("Calibrating...")
@@ -156,6 +160,8 @@ func calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		return errors.New("calibração cancelada")
 	}
 	return nil
 }
