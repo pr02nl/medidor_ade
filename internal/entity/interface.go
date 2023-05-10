@@ -7,6 +7,7 @@ type MedicaoRepositoryInterface interface {
 
 type MedidorRepositoryInterface interface {
 	Save(medidor *Medidor) error
+	Update(medidor *Medidor) error
 	InitTable() error
 	Load() (*Medidor, error)
 }
