@@ -133,7 +133,7 @@ func main() {
 		var resp string
 		fmt.Scanln(&resp)
 		if resp == "S" || resp == "s" {
-			medicaoUseCase := usecases.NewCreateMedicaoUseCase(medicaoRepository, ade)
+			medicaoUseCase := usecases.NewCreateMedicaoUseCase(medidor, medicaoRepository, ade)
 			for {
 				err = medicaoUseCase.Execute()
 				if err != nil {
