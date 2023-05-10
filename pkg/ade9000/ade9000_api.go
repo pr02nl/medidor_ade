@@ -611,7 +611,7 @@ func (ade *ADE9000Api) ReadAngleRegsnValues(data *AngleRegs) error {
 	if err != nil {
 		return err
 	}
-	if (temp & 0x0100) >= 0 {
+	if (temp & 0x0100) == 0x0100 {
 		mulConstant = 0.02109375
 	} else {
 		mulConstant = 0.017578125
