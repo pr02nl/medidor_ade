@@ -255,7 +255,6 @@ func (c *Calibration) loopInt(p gpio.PinIO) {
 }
 
 func (c *Calibration) updateEnergyRegisterFromInterrupt() error {
-	fmt.Println("Interrupt")
 	temp, err := c.ADE.SPI_Read_32bit(ADDR_STATUS0)
 	if err != nil {
 		return err

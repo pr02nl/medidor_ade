@@ -2,7 +2,6 @@ package ade9000
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"periph.io/x/conn/v3/gpio"
@@ -133,7 +132,6 @@ func (ade *ADE9000Api) SPI_Read_16bit(address uint16) (uint16, error) {
 }
 
 func (ade *ADE9000Api) SPI_Write_32bit(address uint16, data uint32) error {
-	fmt.Printf("SPI_Write_32bit: address: %#x, data: %#x\n", address, data)
 	temp_address := ((address << 4) & 0xFFF0)
 	var err error
 	if err = ade.chipSelect_Pin.Out(gpio.Low); err != nil {
