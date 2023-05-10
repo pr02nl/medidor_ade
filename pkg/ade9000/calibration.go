@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sync"
 	"time"
 
 	"periph.io/x/conn/v3/gpio"
@@ -48,22 +49,32 @@ type Calibration struct {
 	interruptRun                        bool
 }
 
+var lock = &sync.Mutex{}
+var singleInstance *Calibration
+
 func NewCalibration(ade9000Api ADE9000Interface) *Calibration {
-	return &Calibration{
-		ADE:                         ade9000Api,
-		XIgain_register_address:     [IGAIN_CAL_REG_SIZE]int32{ADDR_AIGAIN, ADDR_BIGAIN, ADDR_CIGAIN, ADDR_NIGAIN},
-		XIrms_registers_address:     [IGAIN_CAL_REG_SIZE]int32{ADDR_AIRMS, ADDR_BIRMS, ADDR_CIRMS, ADDR_NIRMS},
-		XVgain_register_address:     [VGAIN_CAL_REG_SIZE]int32{ADDR_AVGAIN, ADDR_BVGAIN, ADDR_CVGAIN},
-		XVrms_registers_address:     [VGAIN_CAL_REG_SIZE]int32{ADDR_AVRMS, ADDR_BVRMS, ADDR_CVRMS},
-		XPhcal_register_address:     [PHCAL_CAL_REG_SIZE]int32{ADDR_APHCAL0, ADDR_BPHCAL0, ADDR_CPHCAL0},
-		XWATTHRHI_registers_address: [PHCAL_CAL_REG_SIZE]int32{ADDR_AWATTHR_HI, ADDR_BWATTHR_HI, ADDR_CWATTHR_HI},
-		XVARHRHI_registers_address:  [PHCAL_CAL_REG_SIZE]int32{ADDR_AVARHR_HI, ADDR_BVARHR_HI, ADDR_CVARHR_HI},
-		XPgain_register_address:     [PGAIN_CAL_REG_SIZE]int32{ADDR_APGAIN, ADDR_BPGAIN, ADDR_CPGAIN},
-		CalCurrentPGA_gain:          0,
-		CalVoltagePGA_gain:          0,
-		accTime:                     0,
-		interruptRun:                false,
+	if singleInstance == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if singleInstance == nil {
+			singleInstance = &Calibration{
+				ADE:                         ade9000Api,
+				XIgain_register_address:     [IGAIN_CAL_REG_SIZE]int32{ADDR_AIGAIN, ADDR_BIGAIN, ADDR_CIGAIN, ADDR_NIGAIN},
+				XIrms_registers_address:     [IGAIN_CAL_REG_SIZE]int32{ADDR_AIRMS, ADDR_BIRMS, ADDR_CIRMS, ADDR_NIRMS},
+				XVgain_register_address:     [VGAIN_CAL_REG_SIZE]int32{ADDR_AVGAIN, ADDR_BVGAIN, ADDR_CVGAIN},
+				XVrms_registers_address:     [VGAIN_CAL_REG_SIZE]int32{ADDR_AVRMS, ADDR_BVRMS, ADDR_CVRMS},
+				XPhcal_register_address:     [PHCAL_CAL_REG_SIZE]int32{ADDR_APHCAL0, ADDR_BPHCAL0, ADDR_CPHCAL0},
+				XWATTHRHI_registers_address: [PHCAL_CAL_REG_SIZE]int32{ADDR_AWATTHR_HI, ADDR_BWATTHR_HI, ADDR_CWATTHR_HI},
+				XVARHRHI_registers_address:  [PHCAL_CAL_REG_SIZE]int32{ADDR_AVARHR_HI, ADDR_BVARHR_HI, ADDR_CVARHR_HI},
+				XPgain_register_address:     [PGAIN_CAL_REG_SIZE]int32{ADDR_APGAIN, ADDR_BPGAIN, ADDR_CPGAIN},
+				CalCurrentPGA_gain:          0,
+				CalVoltagePGA_gain:          0,
+				accTime:                     0,
+				interruptRun:                false,
+			}
+		}
 	}
+	return singleInstance
 }
 
 func (calibration *Calibration) GetPGA_gain() error {
