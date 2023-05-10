@@ -229,7 +229,7 @@ func (u *Calibration) CalibrationEnergyRegisterSetup() error {
 }
 
 func (c *Calibration) loopInt(p gpio.PinIO) {
-	for p.WaitForEdge(2 * time.Second) {
+	for p.WaitForEdge(-1) {
 		err := c.updateEnergyRegisterFromInterrupt()
 		if err != nil {
 			fmt.Println(err)
