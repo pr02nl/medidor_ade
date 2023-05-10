@@ -183,6 +183,10 @@ func (calibration *Calibration) PGain_calibrate(pGaincalPF float32) error {
 	time.Sleep((ACCUMULATION_TIME + 1) * time.Millisecond)
 	temp := (ADE90xx_FDSP * NOMINAL_INPUT_VOLTAGE * NOMINAL_INPUT_CURRENT * CALIBRATION_ACC_TIME * CURRENT_TRANSFER_FUNCTION * float32(calibration.CalCurrentPGA_gain) * VOLTAGE_TRANSFER_FUNCTION * float32(calibration.CalVoltagePGA_gain) * ADE9000_WATT_FULL_SCALE_CODES * 2 * (pGaincalPF)) / (8192)
 	expectedActiveEnergyCode := int32(temp)
+	fmt.Printf("Expected Energy Code: %#X\n", expectedActiveEnergyCode)
+	for calibration.accTime != (ACCUMULATION_TIME - 1) {
+		fmt.Println("Waiting for Accumulation Time to complete ", calibration.accTime)
+	}
 	for i := 0; i < PGAIN_CAL_REG_SIZE; i++ {
 		actualActiveEnergyCode := calibration.AccumulatedActiveEnergy_registers[i]
 		temp = ((float32(expectedActiveEnergyCode) / float32(actualActiveEnergyCode)) - 1) * 134217728 //calculate the gain.
