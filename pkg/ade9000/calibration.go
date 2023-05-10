@@ -165,6 +165,9 @@ func (c *Calibration) DegreesToRadians(degrees float64) float64 {
 func (calibration *Calibration) Phase_calibrate() error {
 	time.Sleep((ACCUMULATION_TIME + 1) * time.Millisecond)
 	omega := 2 * math.Pi * INPUT_FREQUENCY / ADE90xx_FDSP
+	for calibration.accTime != (ACCUMULATION_TIME - 1) {
+		fmt.Println("Waiting for Accumulation Time to complete ", calibration.accTime)
+	}
 	for i := 0; i < PHCAL_CAL_REG_SIZE; i++ {
 		actualActiveEnergyCode := calibration.AccumulatedActiveEnergy_registers[i]
 		actualReactiveEnergyCode := calibration.AccumulatedReactiveEnergy_registers[i]
@@ -175,6 +178,11 @@ func (calibration *Calibration) Phase_calibrate() error {
 		if err != nil {
 			return nil
 		}
+	}
+	calibration.accTime = 0
+	for i := 0; i < EGY_REG_SIZE; i++ {
+		calibration.AccumulatedActiveEnergy_registers[i] = 0
+		calibration.AccumulatedReactiveEnergy_registers[i] = 0
 	}
 	return nil
 }
@@ -195,6 +203,11 @@ func (calibration *Calibration) PGain_calibrate(pGaincalPF float32) error {
 		if err != nil {
 			return err
 		}
+	}
+	calibration.accTime = 0
+	for i := 0; i < EGY_REG_SIZE; i++ {
+		calibration.AccumulatedActiveEnergy_registers[i] = 0
+		calibration.AccumulatedReactiveEnergy_registers[i] = 0
 	}
 	return nil
 }
@@ -250,27 +263,21 @@ func (c *Calibration) updateEnergyRegisterFromInterrupt() error {
 	temp &= EGY_INTERRUPT_MASK0
 	if temp == EGY_INTERRUPT_MASK0 {
 		c.ADE.SPI_Write_32bit(ADDR_STATUS0, 0xFFFFFFFF)
-		for i := 0; i < EGY_REG_SIZE; i++ {
-			reg, err := c.ADE.SPI_Read_32bit(uint16(c.XWATTHRHI_registers_address[i]))
-			if err != nil {
-				return err
-			}
-			c.AccumulatedActiveEnergy_registers[i] += int32(reg)
-			reg, err = c.ADE.SPI_Read_32bit(uint16(c.XVARHRHI_registers_address[i]))
-			if err != nil {
-				return err
-			}
-			c.AccumulatedReactiveEnergy_registers[i] += int32(reg)
-		}
-		if c.accTime == (ACCUMULATION_TIME - 1) {
+		if c.accTime < ACCUMULATION_TIME {
 			for i := 0; i < EGY_REG_SIZE; i++ {
-				c.AccumulatedActiveEnergy_registers[i] = 0
-				c.AccumulatedReactiveEnergy_registers[i] = 0
+				reg, err := c.ADE.SPI_Read_32bit(uint16(c.XWATTHRHI_registers_address[i]))
+				if err != nil {
+					return err
+				}
+				c.AccumulatedActiveEnergy_registers[i] += int32(reg)
+				reg, err = c.ADE.SPI_Read_32bit(uint16(c.XVARHRHI_registers_address[i]))
+				if err != nil {
+					return err
+				}
+				c.AccumulatedReactiveEnergy_registers[i] += int32(reg)
 			}
-			c.accTime = 0
-			return nil
+			c.accTime++
 		}
-		c.accTime++
 	}
 	return nil
 }
