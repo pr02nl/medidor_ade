@@ -141,7 +141,8 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-			} else if !medidor.CalibratedCurrent {
+			}
+			if !medidor.CalibratedCurrent {
 				fmt.Printf("Adicione uma corrente de %vA e tecle enter\n", medidor.NominalCurrent)
 				fmt.Scanln(resposta)
 				err = usecases.NewCalibrateCurrentUseCase(medidorRepository, ade).Execute()
@@ -153,7 +154,8 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-			} else if !medidor.CalibratedPower {
+			}
+			if !medidor.CalibratedPower {
 				fmt.Printf("Adicione a tensão nominal (%vV) e corrente nominal (%vA) e FP = 1 e tecle enter\n", medidor.NominalVoltage, medidor.NominalCurrent)
 				fmt.Scanln(resposta)
 				err = usecases.NewCalibratePowerUseCase(medidorRepository, ade).Execute()
@@ -165,7 +167,8 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-			} else if !medidor.CalibratedPhase {
+			}
+			if !medidor.CalibratedPhase {
 				fmt.Printf("Adicione a tensão nominal (%vV) e corrente nominal (%vA) e FP = 0.5 e tecle enter\n", medidor.NominalVoltage, medidor.NominalCurrent)
 				fmt.Scanln(resposta)
 				err = usecases.NewCalibratePhaseUseCase(medidorRepository, ade).Execute()
