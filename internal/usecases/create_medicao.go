@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"log"
 	"math"
 	"time"
 
@@ -10,15 +11,17 @@ import (
 )
 
 type CreateMedicaoUseCase struct {
+	Medidor           *entity.Medidor
 	MedicaoRepository entity.MedicaoRepositoryInterface
 	ade9000           ade9000.ADE9000Interface
 }
 
-func NewCreateMedicaoUseCase(medicaoRepository entity.MedicaoRepositoryInterface, ade9000 ade9000.ADE9000Interface) *CreateMedicaoUseCase {
-	return &CreateMedicaoUseCase{MedicaoRepository: medicaoRepository, ade9000: ade9000}
+func NewCreateMedicaoUseCase(medidor *entity.Medidor, medicaoRepository entity.MedicaoRepositoryInterface, ade9000 ade9000.ADE9000Interface) *CreateMedicaoUseCase {
+	return &CreateMedicaoUseCase{MedicaoRepository: medicaoRepository, ade9000: ade9000, Medidor: medidor}
 }
 
 func (u *CreateMedicaoUseCase) Execute() error {
+	log.Println("Creating Medicao...")
 	voltageRms := ade9000.VoltageRMS{}
 	currentRms := ade9000.CurrentRMS{}
 	activePower := ade9000.Power{}
@@ -83,6 +86,7 @@ func (u *CreateMedicaoUseCase) Execute() error {
 	medicao := entity.Medicao{
 		ID:              uuid.New().String(),
 		DateTime:        time.Now(),
+		MedidorID:       u.Medidor.ID,
 		VoltageRMS_A:    voltageRms.VoltageRMS_A,
 		VoltageRMS_B:    voltageRms.VoltageRMS_B,
 		VoltageRMS_C:    voltageRms.VoltageRMS_C,
