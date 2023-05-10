@@ -91,7 +91,15 @@ func main() {
 	fmt.Printf("RUN Register: %#X\n", read)
 
 	medidorRepository := database.NewMedidorRepository(db)
-	medidorRepository.InitTable()
+	err = medidorRepository.InitTable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	medicaoRepository := database.NewMedicaoRepository(db)
+	err = medicaoRepository.InitTable()
+	if err != nil {
+		log.Fatal(err)
+	}
 	loadUseCase := usecases.NewLoadMedidorUseCase(medidorRepository)
 	medidor, err := loadUseCase.Execute()
 	if err != nil {
@@ -121,7 +129,19 @@ func main() {
 	fmt.Printf("Medidor: %+v\n", medidor.ID)
 
 	if medidor.CalibratedVoltage && medidor.CalibratedCurrent && medidor.CalibratedPower && medidor.CalibratedPhase {
-		log.Println("Medidor já calibrado!")
+		log.Println("Medidor já calibrado! Deseja iniciar a medição? (S/N)")
+		var resp string
+		fmt.Scanln(&resp)
+		if resp == "S" || resp == "s" {
+			medicaoUseCase := usecases.NewCreateMedicaoUseCase(medicaoRepository, ade)
+			for {
+				err = medicaoUseCase.Execute()
+				if err != nil {
+					log.Fatal(err)
+				}
+				time.Sleep(1 * time.Minute)
+			}
+		}
 	} else {
 		cal, err := calibration(ade, *medidor)
 		if err != nil {
