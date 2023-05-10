@@ -220,7 +220,7 @@ func (u *Calibration) CalibrationEnergyRegisterSetup() error {
 	if p == nil {
 		return errors.New("failed to find IRQ0")
 	}
-	if err := p.In(gpio.PullDown, gpio.FallingEdge); err != nil {
+	if err := p.In(gpio.PullNoChange, gpio.FallingEdge); err != nil {
 		return err
 	}
 	go u.loopInt(p)
