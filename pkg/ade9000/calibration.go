@@ -45,6 +45,7 @@ type Calibration struct {
 	CalCurrentPGA_gain                  int8
 	CalVoltagePGA_gain                  int8
 	CalibrationDataToEEPROM             [CALIBRATION_CONSTANTS_ARRAY_SIZE]uint32
+	interruptRun                        bool
 }
 
 func NewCalibration(ade9000Api ADE9000Interface) *Calibration {
@@ -61,6 +62,7 @@ func NewCalibration(ade9000Api ADE9000Interface) *Calibration {
 		CalCurrentPGA_gain:          0,
 		CalVoltagePGA_gain:          0,
 		accTime:                     0,
+		interruptRun:                false,
 	}
 }
 
@@ -182,7 +184,10 @@ func (calibration *Calibration) PGain_calibrate(pGaincalPF float32) error {
 	return nil
 }
 
-func (u *Calibration) calibrationEnergyRegisterSetup() error {
+func (u *Calibration) CalibrationEnergyRegisterSetup() error {
+	if u.interruptRun {
+		return nil
+	}
 	if err := u.ADE.SPI_Write_32bit(ADDR_MASK0, EGY_INTERRUPT_MASK0); err != nil { //Enable EGYRDY interrupt
 		return err
 	}
@@ -202,12 +207,13 @@ func (u *Calibration) calibrationEnergyRegisterSetup() error {
 
 	p := gpioreg.ByName(IRQ0)
 	if p == nil {
-		return errors.New("Failed to find IRQ0")
+		return errors.New("failed to find IRQ0")
 	}
 	if err := p.In(gpio.PullDown, gpio.FallingEdge); err != nil {
 		return err
 	}
 	go u.loopInt(p)
+	u.interruptRun = true
 	return nil
 }
 
