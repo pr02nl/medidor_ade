@@ -123,9 +123,61 @@ func main() {
 	if medidor.CalibratedVoltage && medidor.CalibratedCurrent && medidor.CalibratedPower && medidor.CalibratedPhase {
 		log.Println("Medidor já calibrado!")
 	} else {
-		err = calibration(ade, *medidor)
+		cal, err := calibration(ade, *medidor)
 		if err != nil {
 			log.Fatal(err)
+		}
+		if cal {
+			var resposta string
+			if !medidor.CalibratedVoltage {
+				fmt.Printf("Adicione uma tensão de %vV e tecle enter\n", medidor.NominalVoltage)
+				fmt.Scanln(resposta)
+				err = usecases.NewCalibrateVoltageUseCase(medidorRepository, ade).Execute()
+				if err != nil {
+					log.Fatal(err)
+				}
+				medidor.CalibratedVoltage = true
+				_, err = usecases.NewUpdateMedidorUseCase(medidorRepository).Execute(medidor)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if !medidor.CalibratedCurrent {
+				fmt.Printf("Adicione uma corrente de %vA e tecle enter\n", medidor.NominalCurrent)
+				fmt.Scanln(resposta)
+				err = usecases.NewCalibrateCurrentUseCase(medidorRepository, ade).Execute()
+				if err != nil {
+					log.Fatal(err)
+				}
+				medidor.CalibratedCurrent = true
+				_, err = usecases.NewUpdateMedidorUseCase(medidorRepository).Execute(medidor)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if !medidor.CalibratedPower {
+				fmt.Printf("Adicione a tensão nominal (%vV) e corrente nominal (%vA) e FP = 1 e tecle enter\n", medidor.NominalVoltage, medidor.NominalCurrent)
+				fmt.Scanln(resposta)
+				err = usecases.NewCalibratePowerUseCase(medidorRepository, ade).Execute()
+				if err != nil {
+					log.Fatal(err)
+				}
+				medidor.CalibratedPower = true
+				_, err = usecases.NewUpdateMedidorUseCase(medidorRepository).Execute(medidor)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if !medidor.CalibratedPhase {
+				fmt.Printf("Adicione a tensão nominal (%vV) e corrente nominal (%vA) e FP = 0.5 e tecle enter\n", medidor.NominalVoltage, medidor.NominalCurrent)
+				fmt.Scanln(resposta)
+				err = usecases.NewCalibratePhaseUseCase(medidorRepository, ade).Execute()
+				if err != nil {
+					log.Fatal(err)
+				}
+				medidor.CalibratedPhase = true
+				_, err = usecases.NewUpdateMedidorUseCase(medidorRepository).Execute(medidor)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
 		}
 	}
 
@@ -143,28 +195,15 @@ func main() {
 	// loop(ade)
 }
 
-func calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) error {
+func calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) (bool, error) {
 	var calibration string
 	fmt.Println("Medidor ainda não calibrado, deseja iniciar a calibração agora?")
 	fmt.Scanln(&calibration)
 	if calibration == "s" || calibration == "S" {
-		calibration := ade9000.NewCalibration(ade)
-		err := calibration.GetPGA_gain()
-		if err != nil {
-			return err
-		}
-		fmt.Printf("Adicione uma tensão de %vV e tecle enter", medidor.NominalVoltage)
-		fmt.Scan(calibration)
-		time.Sleep(500 * time.Millisecond)
-		println("Calibrating...")
-		err = calibration.VGain_calibrate()
-		if err != nil {
-			return err
-		}
+		return true, nil
 	} else {
-		return errors.New("calibração cancelada: " + calibration)
+		return false, errors.New("calibração cancelada: " + calibration)
 	}
-	return nil
 }
 
 func resetADE9000(reset_pin gpio.PinIO) {
