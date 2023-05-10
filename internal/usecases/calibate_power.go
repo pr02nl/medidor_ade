@@ -1,8 +1,6 @@
 package usecases
 
 import (
-	"time"
-
 	"github.com/pr02nl/medidor_ade/internal/entity"
 	"github.com/pr02nl/medidor_ade/pkg/ade9000"
 )
@@ -19,7 +17,9 @@ func NewCalibratePowerUseCase(medidorRepository entity.MedidorRepositoryInterfac
 func (u *CalibratePowerUseCase) Execute() error {
 	println("Calibrating Power...")
 	calibration := ade9000.NewCalibration(u.ade9000)
-	time.Sleep(500 * time.Millisecond)
+	if err := calibration.CalibrationEnergyRegisterSetup(); err != nil {
+		return err
+	}
 	if err := calibration.PGain_calibrate(1); err != nil {
 		return err
 	}
