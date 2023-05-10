@@ -83,3 +83,20 @@ func (r *MedidorRepository) Load() (*entity.Medidor, error) {
 	}
 	return &medidor, nil
 }
+
+func (r *MedidorRepository) Update(medidor *entity.Medidor) error {
+	stmt, err := r.Db.Prepare(`
+		UPDATE medidor SET nominalVoltage=?, nominalCurrent=?, currentTransformerRatio=?, frequency=?, 
+			currentTransfer=?, voltageTransfer=?, calIrmsCC=?, calVrmsCC=?, calPwrCC=?, calEnergyCC=?, 
+			calibratedVoltage=?, calibratedCurrent=?, calibratedPower=?, calibratedPhase=? WHERE id=?
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(medidor.NominalVoltage, medidor.NominalCurrent, medidor.CurrentTransformerRatio, medidor.Frequency, medidor.CurrentTransfer, medidor.VoltageTransfer, medidor.CalIrmsCC, medidor.CalVrmsCC, medidor.CalPwrCC, medidor.CalEnergyCC, medidor.CalibratedVoltage, medidor.CalibratedCurrent, medidor.CalibratedPower, medidor.CalibratedPhase, medidor.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
