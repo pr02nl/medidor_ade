@@ -129,18 +129,14 @@ func main() {
 	fmt.Printf("Medidor: %+v\n", medidor.ID)
 
 	if medidor.CalibratedVoltage && medidor.CalibratedCurrent && medidor.CalibratedPower && medidor.CalibratedPhase {
-		log.Println("Medidor já calibrado! Deseja iniciar a medição? (S/N)")
-		var resp string
-		fmt.Scanln(&resp)
-		if resp == "S" || resp == "s" {
-			medicaoUseCase := usecases.NewCreateMedicaoUseCase(medidor, medicaoRepository, ade)
-			for {
-				err = medicaoUseCase.Execute()
-				if err != nil {
-					log.Fatal(err)
-				}
-				time.Sleep(1 * time.Minute)
+		log.Println("Medidor já calibrado! Iniciando medição.")
+		medicaoUseCase := usecases.NewCreateMedicaoUseCase(medidor, medicaoRepository, ade)
+		for {
+			err = medicaoUseCase.Execute()
+			if err != nil {
+				log.Fatal(err)
 			}
+			time.Sleep(1 * time.Minute)
 		}
 	} else {
 		cal, err := calibration(ade, *medidor)
