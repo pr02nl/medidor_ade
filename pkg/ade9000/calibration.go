@@ -19,7 +19,7 @@ const (
 	EGY_REG_SIZE        = 3
 	ACCUMULATION_TIME   = 5
 	EGY_INTERRUPT_MASK0 = 1
-	IRQ0                = "GPIO10"
+	IRQ0                = "GPIO17"
 )
 
 type Calibration struct {
