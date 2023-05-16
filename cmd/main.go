@@ -45,12 +45,6 @@ func main() {
 		log.Fatal(err)
 	}
 	println("Host initialized")
-	// println("Loading configs...")
-	// configs, err := configs.LoadConfig(".")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// println("Configs loaded")
 	println("Connecting to database...")
 	db, err := sql.Open("sqlite3", "medidor.db")
 	if err != nil {
