@@ -175,7 +175,7 @@ func (ade *ADE9000Api) SPI_Init(SPI_speed uint32, chipSelect_Pin string) (spi.Po
 	}
 	ade.chipSelect_Pin = spinSelect
 	// Use spireg SPI port registry to find the first available SPI bus.
-	p, err := spireg.Open("")
+	p, err := spireg.Open("SPI0.1")
 	if err != nil {
 		return nil, err
 	}
