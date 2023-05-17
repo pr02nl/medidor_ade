@@ -30,7 +30,7 @@ import (
 */
 
 const (
-	CS                = "GPIO8"
+	CS                = "GPIO2"
 	PM_1              = "GPIO25"
 	ADE9000_RESET_PIN = "GPIO22"
 	// IRQ0              = "GPIO17"
@@ -72,6 +72,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer spi.Close()
+	fmt.Println(spi.String())
 
 	err = ade.SetupADE9000()
 	if err != nil {
@@ -133,7 +134,7 @@ func main() {
 			time.Sleep(1 * time.Minute)
 		}
 	} else {
-		cal, err := calibration(ade, *medidor)
+		cal, err := Calibration(ade, *medidor)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -192,22 +193,9 @@ func main() {
 			}
 		}
 	}
-
-	// println("Calibrating...")
-	// calibration := ade9000.NewCalibration(ade)
-	// err = calibration.GetPGA_gain()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// time.Sleep(500 * time.Millisecond)
-	// err = calibration.VGain_calibrate()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// loop(ade)
 }
 
-func calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) (bool, error) {
+func Calibration(ade ade9000.ADE9000Interface, medidor entity.Medidor) (bool, error) {
 	var calibration string
 	fmt.Println("Medidor ainda não calibrado, deseja iniciar a calibração agora?")
 	fmt.Scanln(&calibration)
