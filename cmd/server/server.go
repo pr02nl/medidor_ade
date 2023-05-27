@@ -8,13 +8,10 @@ import (
 
 	"github.com/pr02nl/medidor_ade/configs"
 	"github.com/pr02nl/medidor_ade/internal/infra/database"
-	_ "github.com/sijms/go-ora/v2"
-)
 
-//(description= (retry_count=20)
-// (retry_delay=3)(address=(protocol=tcps)(port=1522)
-// (host=adb.us-ashburn-1.oraclecloud.com))
-// (connect_data=(service_name=gff6197df21179c_owk5v277wxb677sd_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+	// mysql
+	_ "github.com/go-sql-driver/mysql"
+)
 
 func main() {
 	println("Starting...")
@@ -23,8 +20,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	db, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s://%s:%s@%s:%s/%s",
-		configs.DBDriver,
+	db, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		configs.DBUser,
 		configs.DBPassword,
 		configs.DBHost,
