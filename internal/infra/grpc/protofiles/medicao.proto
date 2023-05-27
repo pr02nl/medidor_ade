@@ -1,0 +1,72 @@
+syntax = "proto3";
+package pb;
+option go_package = "internal/infra/grpc/pb";
+
+message CreateMedidorRequest {
+    string id = 1;
+    float nominalVoltage = 2;
+    float nominalCurrent = 3;
+    float currentTransformerRatio = 4;
+    float frequency = 5;
+}
+
+message CreateMedidorResponse {
+    string id = 1;
+    bool created = 2;
+}
+
+message CreateMedicaoRequest {
+    string id = 1;
+    string medidorId = 2;
+    int64 timestamp = 3;
+    double voltageRMS_A = 4;
+    double voltageRMS_B = 5;
+    double voltageRMS_C = 6;
+    double currentRMS_A = 7;
+    double currentRMS_B = 8;
+    double currentRMS_C = 9;
+    double activePower_A = 10;
+    double activePower_B = 11;
+    double activePower_C = 12;
+    double reactivePower_A = 13;
+    double reactivePower_B = 14;
+    double reactivePower_C = 15;
+    double apparentPower_A = 16;
+    double apparentPower_B = 17;
+    double apparentPower_C = 18;
+    float powerFactor_A = 19;
+    float powerFactor_B = 20;
+    float powerFactor_C = 21;
+    float frequency_A = 22;
+    float frequency_B = 23;
+    float frequency_C = 24;
+    float angle_VA_VB = 25;
+    float angle_VB_VC = 26;
+    float angle_VA_VC = 27;
+    float angle_VA_IA = 28;
+    float angle_VB_IB = 29;
+    float angle_VC_IC = 30;
+    float angle_IA_IB = 31;
+    float angle_IB_IC = 32;
+    float angle_IA_IC = 33;
+    float temperature = 34;
+}
+
+message CreateMedicaoResponse {
+    string id = 1;
+    bool created = 2;
+}
+
+message CreateListMedicaoRequest {
+    repeated CreateMedicaoRequest medicoes = 1;
+}
+
+message CreateListMedicaoResponse {
+    repeated CreateMedicaoResponse medicoes = 1;
+}
+
+service MedidorService {
+    rpc CreateMedidor(CreateMedidorRequest) returns (CreateMedidorResponse);
+    rpc CreateMedicao(CreateMedicaoRequest) returns (CreateMedicaoResponse);
+    rpc CreateListMedicao(CreateListMedicaoRequest) returns (CreateListMedicaoResponse);
+}
