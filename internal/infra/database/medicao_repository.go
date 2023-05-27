@@ -16,7 +16,7 @@ func NewMedicaoRepository(db *sql.DB) *MedicaoRepository {
 
 func (r *MedicaoRepository) Save(medicao *entity.Medicao) error {
 	stmt, err := r.Db.Prepare(`
-		INSERT INTO medicao (id, medidorID, datetime, voltage_rms_a, voltage_rms_b, voltage_rms_c, 
+		INSERT INTO medicao (id, medidor_id, datetime, voltage_rms_a, voltage_rms_b, voltage_rms_c, 
 			current_rms_a, current_rms_b, current_rms_c, current_rms_n, active_power_a, active_power_b, 
 			active_power_c, reactive_power_a, reactive_power_b, reactive_power_c, apparent_power_a, 
 			apparent_power_b, apparent_power_c, power_factor_a, power_factor_b, power_factor_c, frequency_a, 
@@ -47,7 +47,7 @@ func (r *MedicaoRepository) InitTable() error {
 	stmt, err := r.Db.Prepare(`
 		CREATE TABLE IF NOT EXISTS medicao (
 			id VARCHAR(36) PRIMARY KEY,
-			medidorID VARCHAR(36),
+			medidor_id VARCHAR(36),
 			datetime DATETIME,
 			voltage_rms_a FLOAT,
 			voltage_rms_b FLOAT,
@@ -80,7 +80,8 @@ func (r *MedicaoRepository) InitTable() error {
 			angle_ia_ib FLOAT,
 			angle_ib_ic FLOAT,
 			angle_ia_ic FLOAT,
-			temperature FLOAT
+			temperature FLOAT,
+			FOREIGN KEY(medidor_id) REFERENCES medidor(id)
 		)
 	`)
 	if err != nil {
