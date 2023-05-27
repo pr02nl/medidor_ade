@@ -3,9 +3,9 @@ module github.com/pr02nl/medidor_ade
 go 1.20
 
 require (
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/uuid v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.16
-	github.com/sijms/go-ora/v2 v2.7.6
 	github.com/spf13/viper v1.15.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/host/v3 v3.8.0
